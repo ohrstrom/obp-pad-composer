@@ -188,6 +188,8 @@ if __name__ == "__main__":
             start_next = None
 
         if start_next:
+            if start_next > 60:
+                start_next = 60
             cprint('{:14s}: Got scheduled item - sleeping for {:} seconds'.format('OK', start_next), 'green')
             time.sleep(start_next)
 
