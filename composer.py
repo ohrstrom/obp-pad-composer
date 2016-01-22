@@ -4,12 +4,12 @@ from __future__ import unicode_literals
 import argparse
 import os
 import logging
+import codecs
 import shutil
 import sys
 import time
 import requests
 from logging.config import fileConfig
-from termcolor import cprint
 
 NUM_CHARS = 72
 DEFAULT_SLEEP = 10
@@ -26,39 +26,39 @@ class Composer:
 
     def __init__(self, api_base_url, channel_id, timeshift, dls_path, slides_path):
 
-        cprint('#' * NUM_CHARS, 'green')
-        cprint('{:14s}: {:}'.format('api_base_url', api_base_url), 'green')
-        cprint('{:14s}: {:}'.format('channel_id', channel_id), 'green')
-        cprint('{:14s}: {:}'.format('timeshift', timeshift), 'green')
-        cprint('{:14s}: {:}'.format('dls_path', dls_path), 'green')
-        cprint('{:14s}: {:}'.format('slides_path', slides_path), 'green')
-        print
+
+        log.info('{:}: {:}'.format('api_base_url', api_base_url))
+        log.info('{:}: {:}'.format('channel_id', channel_id))
+        log.info('{:}: {:}'.format('timeshift', timeshift))
+        log.info('{:}: {:}'.format('dls_path', dls_path))
+        log.info('{:}: {:}'.format('slides_path', slides_path))
+
 
         config_errors = False
 
         if os.path.isfile(dls_path):
-            cprint('{:14s}: {:} - file exists'.format('OK', dls_path), 'green')
+            log.info('{:} - file exists'.format(dls_path))
         else:
-            cprint('{:14s}: {:} - file does not exist!'.format('ERROR', dls_path), 'red')
+            log.error('{:} - file does not exist!'.format(dls_path))
             sys.exit(1)
 
         if os.access(dls_path, os.W_OK):
-            cprint('{:14s}: {:} - file is writable'.format('OK', dls_path), 'green')
+            log.info('{:} - file is writable'.format(dls_path))
         else:
-            cprint('{:14s}: {:} - file not writable!'.format('ERROR', dls_path), 'red')
+            log.error('{:} - file not writable!'.format(dls_path))
             sys.exit(1)
 
 
         if os.path.isdir(slides_path):
-            cprint('{:14s}: {:} - directory exists'.format('OK', slides_path), 'green')
+            log.info('{:} - directory exists'.format(slides_path))
         else:
-            cprint('{:14s}: {:} - directory does not exist!'.format('ERROR', slides_path), 'red')
+            log.error('{:} - directory does not exist!'.format(slides_path))
             sys.exit(1)
 
         if os.access(slides_path, os.W_OK):
-            cprint('{:14s}: {:} - directory is writable'.format('OK', slides_path), 'green')
+            log.info('{:} - directory is writable'.format(slides_path))
         else:
-            cprint('{:14s}: {:} - directory not writable!'.format('ERROR', slides_path), 'red')
+            log.error('{:} - directory not writable!'.format(slides_path))
             sys.exit(1)
 
         self.api_url = '{0}/api/v1/abcast/channel/{1}/on-air/?timeshift={2}&include-dls'.format(
@@ -77,9 +77,8 @@ class Composer:
 
     def update_current_item(self):
 
-        print 1
         log.debug('Calling API at: {:}'.format(self.api_url))
-        print 2
+
         r = requests.get(self.api_url)
         response = r.json()
 
@@ -94,7 +93,7 @@ class Composer:
             self.current_dls_text = text
             self.set_dls_text(text)
         else:
-            cprint('Text unchanged', 'yellow')
+            log.debug('Text unchanged')
 
 
         dls_slides = response.get('dls_slides', None)
@@ -103,7 +102,7 @@ class Composer:
             self.current_dls_slides = dls_slides
             self.set_dls_slides(dls_slides)
         else:
-            cprint('Slide unchanged', 'yellow')
+            log.debug('Slide unchanged')
 
 
         return response.get('start_next', None)
@@ -111,9 +110,9 @@ class Composer:
 
     def set_dls_text(self, text):
 
-        cprint('Setting dls text to:\n{:}'.format(text), 'cyan')
+        log.debug('Setting dls text to:\n{:}'.format(text))
 
-        with open(self.dls_path, 'w') as dls_text_file:
+        with codecs.open(self.dls_path, 'w', "utf-8") as dls_text_file:
             dls_text_file.write(text)
 
 
@@ -128,7 +127,7 @@ class Composer:
         for slide in slides:
 
             slide_url = self.api_base_url + slide
-            cprint('Setting dls slide to: {:}'.format(slide_url), 'cyan')
+            log.debug('Setting dls slide to: {:}'.format(slide_url))
 
             path = os.path.join(self.slides_path, os.path.basename(slide))
             r = requests.get(slide_url, stream=True)
@@ -186,21 +185,20 @@ if __name__ == "__main__":
 
     while True:
 
-
         try:
             start_next = composer.update_current_item()
         except (ValueError, requests.ConnectionError) as e:
-            cprint('{:14s}: Unable to connect to API - {:} {:}'.format('WARNING', type(e), e.args), 'yellow')
+            log.warning('Unable to connect to API - {:} {:}'.format(type(e), e.args))
             start_next = None
 
         if start_next:
             if start_next > 60:
                 start_next = 60
-            cprint('{:14s}: Got scheduled item - sleeping for {:} seconds'.format('OK', start_next), 'green')
+            log.debug('Got scheduled item - sleeping for {:} seconds'.format(start_next))
             time.sleep(start_next)
 
         else:
-            cprint('{:14s}: No scheduled item - sleeping for {:} seconds'.format('OK', DEFAULT_SLEEP), 'cyan')
+            log.debug('No scheduled item - sleeping for {:} seconds'.format(DEFAULT_SLEEP))
             time.sleep(DEFAULT_SLEEP)
 
 
