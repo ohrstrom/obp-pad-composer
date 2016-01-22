@@ -3,10 +3,12 @@ from __future__ import unicode_literals
 
 import argparse
 import os
+import logging
 import shutil
 import sys
 import time
 import requests
+from logging.config import fileConfig
 from termcolor import cprint
 
 NUM_CHARS = 72
@@ -15,6 +17,10 @@ DEFAULT_SLEEP = 10
 DEFAULT_API_BASE_URL = 'http://10.40.10.40:8080'
 DEFAULT_CHANNEL_ID = 1
 DEFAULT_TIME_SHIFT = 10
+
+fileConfig('logging.ini')
+log = logging.getLogger()
+
 
 class Composer:
 
@@ -66,11 +72,14 @@ class Composer:
         self.slides_path = slides_path
 
         self.current_dls_text = None
-        self.current_dls_slide = None
+        self.current_dls_slides = None
 
 
     def update_current_item(self):
 
+        print 1
+        log.debug('Calling API at: {:}'.format(self.api_url))
+        print 2
         r = requests.get(self.api_url)
         response = r.json()
 
@@ -90,14 +99,9 @@ class Composer:
 
         dls_slides = response.get('dls_slides', None)
 
-        if dls_slides and len(dls_slides) > 0:
-            slide = dls_slides[0]
-        else:
-            slide = None
-
-        if not self.current_dls_slide == slide:
-            self.current_dls_slide = slide
-            self.set_dls_slide(slide)
+        if not self.current_dls_slides == dls_slides:
+            self.current_dls_slides = dls_slides
+            self.set_dls_slides(dls_slides)
         else:
             cprint('Slide unchanged', 'yellow')
 
@@ -113,10 +117,7 @@ class Composer:
             dls_text_file.write(text)
 
 
-    def set_dls_slide(self, slide):
-
-        slide_url = self.api_base_url + slide
-        cprint('Setting dls slide to: {:}'.format(slide_url), 'cyan')
+    def set_dls_slides(self, slides):
 
         for file in os.listdir(self.slides_path):
             if file.endswith(".png"):
@@ -124,12 +125,17 @@ class Composer:
                 os.unlink(path)
 
 
-        path = os.path.join(self.slides_path, os.path.basename(slide))
-        r = requests.get(slide_url, stream=True)
-        if r.status_code == 200:
-            with open(path, 'wb') as f:
-                r.raw.decode_content = True
-                shutil.copyfileobj(r.raw, f)
+        for slide in slides:
+
+            slide_url = self.api_base_url + slide
+            cprint('Setting dls slide to: {:}'.format(slide_url), 'cyan')
+
+            path = os.path.join(self.slides_path, os.path.basename(slide))
+            r = requests.get(slide_url, stream=True)
+            if r.status_code == 200:
+                with open(path, 'wb') as f:
+                    r.raw.decode_content = True
+                    shutil.copyfileobj(r.raw, f)
 
 
 
