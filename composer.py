@@ -8,6 +8,8 @@ import codecs
 import shutil
 import sys
 import time
+import sched
+from threading import Timer
 import requests
 from logging.config import fileConfig
 
@@ -71,9 +73,11 @@ class Composer:
         self.dls_path = dls_path
         self.slides_path = slides_path
 
-        self.current_dls_text = None
-        self.current_dls_slides = None
+        self.current_dls = None
+        self.current_dls_index = 0
+        self.set_dls_text(2)
 
+        self.current_slides = None
 
     def update_current_item(self):
 
@@ -82,25 +86,28 @@ class Composer:
         r = requests.get(self.api_url)
         response = r.json()
 
-        dls_text = response.get('dls_text', None)
+        dls = response.get('dls_text', None)
 
-        if dls_text and len(dls_text) > 0:
-            text = dls_text[0]
+        if dls and len(dls) > 0:
+            self.current_dls = dls
+            for text in dls:
+                print text
+
         else:
             text = None
 
-        if not self.current_dls_text == text:
-            self.current_dls_text = text
-            self.set_dls_text(text)
-        else:
-            log.debug('Text unchanged')
+        # if not self.current_dls == text:
+        #     self.current_dls = text
+        #     self.set_dls_text(text)
+        # else:
+        #     log.debug('Text unchanged')
 
 
-        dls_slides = response.get('dls_slides', None)
+        slides = response.get('slides', None)
 
-        if not self.current_dls_slides == dls_slides:
-            self.current_dls_slides = dls_slides
-            self.set_dls_slides(dls_slides)
+        if not self.current_slides == slides:
+            self.current_slides = slides
+            self.set_slides(slides)
         else:
             log.debug('Slide unchanged')
 
@@ -108,7 +115,24 @@ class Composer:
         return response.get('start_next', None)
 
 
-    def set_dls_text(self, text):
+    def set_dls_text(self, interval):
+        Timer(interval, self.set_dls_text, {interval}).start()
+        if not self.current_dls:
+            return
+
+        if len(self.current_dls) < (self.current_dls_index + 1):
+            self.current_dls_index = 0
+
+        text = self.current_dls[self.current_dls_index]
+        log.debug('Setting dls text to:\n{:}'.format(text))
+        with codecs.open(self.dls_path, 'w', "utf-8") as dls_text_file:
+            dls_text_file.write(text)
+
+        self.current_dls_index += 1
+
+    def __orig__set_dls_text(self, text):
+
+        print 'set_dls_text: {}'.format(text)
 
         log.debug('Setting dls text to:\n{:}'.format(text))
 
@@ -116,7 +140,7 @@ class Composer:
             dls_text_file.write(text)
 
 
-    def set_dls_slides(self, slides):
+    def set_slides(self, slides):
 
         for file in os.listdir(self.slides_path):
             if file.endswith(".png"):
