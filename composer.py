@@ -19,6 +19,7 @@ DEFAULT_SLEEP = 10
 DEFAULT_API_BASE_URL = 'http://10.40.10.40:8080'
 DEFAULT_CHANNEL_ID = 1
 DEFAULT_TIME_SHIFT = 10
+DEFAULT_DLS_INTERVAL = 10
 
 fileConfig('logging.ini')
 log = logging.getLogger()
@@ -26,7 +27,7 @@ log = logging.getLogger()
 
 class Composer:
 
-    def __init__(self, api_base_url, channel_id, timeshift, dls_path, slides_path):
+    def __init__(self, api_base_url, channel_id, timeshift, dls_interval, dls_path, slides_path):
 
 
         log.info('{:}: {:}'.format('api_base_url', api_base_url))
@@ -34,6 +35,8 @@ class Composer:
         log.info('{:}: {:}'.format('timeshift', timeshift))
         log.info('{:}: {:}'.format('dls_path', dls_path))
         log.info('{:}: {:}'.format('slides_path', slides_path))
+        log.info('{:}: {:}'.format('slides_path', slides_path))
+        log.info('{:}: {:}'.format('dls_interval', dls_interval))
 
 
         config_errors = False
@@ -75,7 +78,7 @@ class Composer:
 
         self.current_dls = None
         self.current_dls_index = 0
-        self.set_dls_text(2)
+        self.set_dls_text(dls_interval)
 
         self.current_slides = None
 
@@ -184,9 +187,17 @@ if __name__ == "__main__":
     )
     parser.add_argument(
             '-t', '--timeshift',
+            type=int,
             metavar='',
             help='Time-shift [{0}]'.format(DEFAULT_TIME_SHIFT),
             default=DEFAULT_TIME_SHIFT
+    )
+    parser.add_argument(
+            '--dls_interval',
+            type=int,
+            metavar='',
+            help='Interval for DLS text update [{0}]'.format(DEFAULT_TIME_SHIFT),
+            default=DEFAULT_DLS_INTERVAL
     )
     parser.add_argument(
             '-d', '--dls',
