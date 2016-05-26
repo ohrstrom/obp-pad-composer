@@ -27,16 +27,23 @@ log = logging.getLogger()
 
 class Composer:
 
-    def __init__(self, api_base_url, channel_id, timeshift, dls_interval, dls_path, slides_path):
+    def __init__(self, **kwargs):
+
+        api_base_url = kwargs.get('api_base_url')
+        channel_id = kwargs.get('channel_id')
+        timeshift = kwargs.get('timeshift')
+        dls_interval = kwargs.get('dls_interval')
+        dl_plus = kwargs.get('dl_plus')
+        dls_path = kwargs.get('dls_path')
+        slides_path = kwargs.get('slides_path')
 
 
         log.info('{:}: {:}'.format('api_base_url', api_base_url))
         log.info('{:}: {:}'.format('channel_id', channel_id))
         log.info('{:}: {:}'.format('timeshift', timeshift))
+        log.info('{:}: {:}'.format('dl_plus', dl_plus))
         log.info('{:}: {:}'.format('dls_path', dls_path))
         log.info('{:}: {:}'.format('slides_path', slides_path))
-        log.info('{:}: {:}'.format('slides_path', slides_path))
-        log.info('{:}: {:}'.format('dls_interval', dls_interval))
 
 
         config_errors = False
@@ -78,6 +85,7 @@ class Composer:
 
         self.current_dls = None
         self.current_dls_index = 0
+        self.dl_plus = dl_plus
         self.set_dls_text(dls_interval)
 
         self.current_slides = None
@@ -89,12 +97,15 @@ class Composer:
         r = requests.get(self.api_url)
         response = r.json()
 
-        dls = response.get('dls_text', None)
+        if self.dl_plus:
+            dls = response.get('dl_plus', None)
+        else:
+            dls = response.get('dls_text', None)
 
         if dls and len(dls) > 0:
             self.current_dls = dls
             for text in dls:
-                print text
+                log.debug('DLS text: {0}'.format(text))
 
         else:
             text = None
@@ -132,15 +143,6 @@ class Composer:
             dls_text_file.write(text)
 
         self.current_dls_index += 1
-
-    def __orig__set_dls_text(self, text):
-
-        print 'set_dls_text: {}'.format(text)
-
-        log.debug('Setting dls text to:\n{:}'.format(text))
-
-        with codecs.open(self.dls_path, 'w', "utf-8") as dls_text_file:
-            dls_text_file.write(text)
 
 
     def set_slides(self, slides):
@@ -198,6 +200,13 @@ if __name__ == "__main__":
             metavar='',
             help='Interval for DLS text update [{0}]'.format(DEFAULT_TIME_SHIFT),
             default=DEFAULT_DLS_INTERVAL
+    )
+    parser.add_argument(
+            '-p', '--dl_plus',
+            action='store_true',
+            dest='dl_plus',
+            help='Include DL+ notation in dls text [{0}]'.format(False),
+            default=False
     )
     parser.add_argument(
             '-d', '--dls',
