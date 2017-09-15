@@ -20,6 +20,7 @@ DEFAULT_API_BASE_URL = 'http://10.40.10.40:8080'
 DEFAULT_CHANNEL_ID = 1
 DEFAULT_TIME_SHIFT = 10
 DEFAULT_DLS_INTERVAL = 10
+DEFAULT_SLIDE_INTERVAL = 45
 
 fileConfig('logging.ini')
 log = logging.getLogger()
@@ -33,6 +34,7 @@ class Composer:
         channel_id = kwargs.get('channel_id')
         timeshift = kwargs.get('timeshift')
         dls_interval = kwargs.get('dls_interval')
+        slide_interval = kwargs.get('slide_interval')
         dl_plus = kwargs.get('dl_plus')
         dls_path = kwargs.get('dls_path')
         slides_path = kwargs.get('slides_path')
@@ -89,6 +91,8 @@ class Composer:
         self.set_dls_text(dls_interval)
 
         self.current_slides = None
+        self.current_slide_index = 0
+        self.set_slide(slide_interval)
 
     def update_current_item(self):
 
@@ -145,29 +149,56 @@ class Composer:
         self.current_dls_index += 1
 
 
+    def set_slide(self, interval):
+        Timer(interval, self.set_slide, {interval}).start()
+        if not self.current_slides:
+            return
+
+        if len(self.current_slides) < (self.current_slide_index + 1):
+            self.current_slide_index = 0
+
+        slide = self.current_slides[self.current_slide_index]
+        log.debug('Setting slide to:\n{:}'.format(slide))
+
+        slide_url = self.api_base_url + slide
+
+        path = os.path.join(self.slides_path, os.path.basename(slide))
+        r = requests.get(slide_url, stream=True)
+
+        # for file in os.listdir(self.slides_path):
+        #     if file.endswith(".png") or file.endswith(".jpg"):
+        #         path = os.path.join(self.slides_path, file)
+        #         os.unlink(path)
+
+        if r.status_code == 200:
+            with open(path, 'wb') as f:
+                r.raw.decode_content = True
+                shutil.copyfileobj(r.raw, f)
+
+        self.current_slide_index += 1
+
+
     def set_slides(self, slides):
 
-        for file in os.listdir(self.slides_path):
-            if file.endswith(".png"):
-                path = os.path.join(self.slides_path, file)
-                os.unlink(path)
+        return
 
-
-        for slide in slides:
-
-            slide_url = self.api_base_url + slide
-            log.debug('Setting dls slide to: {:}'.format(slide_url))
-
-            path = os.path.join(self.slides_path, os.path.basename(slide))
-            r = requests.get(slide_url, stream=True)
-            if r.status_code == 200:
-                with open(path, 'wb') as f:
-                    r.raw.decode_content = True
-                    shutil.copyfileobj(r.raw, f)
-
-
-
-
+        # for file in os.listdir(self.slides_path):
+        #     if file.endswith(".png"):
+        #         path = os.path.join(self.slides_path, file)
+        #         os.unlink(path)
+        #
+        #
+        # for slide in slides:
+        #
+        #     slide_url = self.api_base_url + slide
+        #     log.debug('Setting dls slide to: {:}'.format(slide_url))
+        #
+        #     path = os.path.join(self.slides_path, os.path.basename(slide))
+        #     r = requests.get(slide_url, stream=True)
+        #     if r.status_code == 200:
+        #         with open(path, 'wb') as f:
+        #             r.raw.decode_content = True
+        #             shutil.copyfileobj(r.raw, f)
 
 
 if __name__ == "__main__":
@@ -195,14 +226,21 @@ if __name__ == "__main__":
             default=DEFAULT_TIME_SHIFT
     )
     parser.add_argument(
-            '--dls_interval',
+            '--dls-interval',
             type=int,
-            metavar='',
-            help='Interval for DLS text update [{0}]'.format(DEFAULT_TIME_SHIFT),
+            dest='dls_interval',
+            help='Interval for DLS text update [{0}]'.format(DEFAULT_DLS_INTERVAL),
             default=DEFAULT_DLS_INTERVAL
     )
     parser.add_argument(
-            '-p', '--dl_plus',
+            '--slide-interval',
+            type=int,
+            dest='slide_interval',
+            help='Interval for slide update [{0}]'.format(DEFAULT_SLIDE_INTERVAL),
+            default=DEFAULT_SLIDE_INTERVAL
+    )
+    parser.add_argument(
+            '-p', '--dl-plus',
             action='store_true',
             dest='dl_plus',
             help='Include DL+ notation in dls text [{0}]'.format(False),
@@ -244,12 +282,3 @@ if __name__ == "__main__":
         else:
             log.debug('No scheduled item - sleeping for {:} seconds'.format(DEFAULT_SLEEP))
             time.sleep(DEFAULT_SLEEP)
-
-
-
-
-
-
-
-
-
