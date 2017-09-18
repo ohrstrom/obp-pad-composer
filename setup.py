@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 INSTALL_REQUIREMENTS = [
     'Click>=6.0,<7.0',
-    'click_log>=2.0,<3.0',
+    'click_log>=0.2.0,<0.3.0',
     'requests>=2.9.1',
     'APScheduler>=3.3.1,<4.0',
 ]
