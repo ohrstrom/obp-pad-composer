@@ -1,6 +1,7 @@
 meta
 .idea
 .tox
+.coverage
 *.pyc
 env/
 venv/

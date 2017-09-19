@@ -16,8 +16,11 @@ from threading import Thread, Timer
 
 log = logging.getLogger(__name__)
 
-DEFAULT_SLEEP = 10
-DEFAULT_MAX_SLEEP = 10
+DEFAULT_DLS_PATH = './meta/dls.txt'
+DEFAULT_SLIDES_PATH = './meta/slides/'
+
+DEFAULT_SLEEP = 30
+DEFAULT_MAX_SLEEP = 30
 DEFAULT_API_BASE_URL = 'http://10.40.10.40:8080'
 DEFAULT_TIME_SHIFT = 10
 DEFAULT_DLS_INTERVAL = 10
@@ -33,13 +36,24 @@ class PadComposer(object):
     last_slide = None
 
 
-    def __init__(self, api_base_url, channel_id, dls_path, slides_path, dl_plus, timeshift, dls_interval, slide_interval):
+    def __init__(
+            self,
+            api_base_url,
+            channel_id,
+            dls_path=DEFAULT_DLS_PATH,
+            slides_path=DEFAULT_SLIDES_PATH,
+            dl_plus=False,
+            timeshift=DEFAULT_TIME_SHIFT,
+            dls_interval=DEFAULT_DLS_INTERVAL,
+            slide_interval=DEFAULT_SLIDE_INTERVAL
+    ):
 
         self.api_base_url = api_base_url
         self.dls_path = dls_path
         self.slides_path = slides_path
         self.dl_plus = dl_plus
         self.dls_interval = dls_interval
+        self.slide_interval = slide_interval
 
         self.api_url = '{api_base_url}/api/v1/abcast/channel/{channel_id}/on-air/?timeshift={timeshift}&include-dls'.format(
             api_base_url=api_base_url,
@@ -187,6 +201,7 @@ class PadComposer(object):
 
         # add 25% reserve & take into account the pad-encoder 'sleep' of 4 seconds
         next_in = transmission_time * 1.25 + 4
+        next_in = self.slide_interval
 
         print('slide size:                  {}bytes'.format(slide_size))
         print('estimated transmission time: {}s'.format(transmission_time))
