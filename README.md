@@ -13,6 +13,18 @@ The composed metadata then is fed to [ODR-PadEnc](https://github.com/Opendigital
 [Digris](http://digris.ch) DAB+ network via [ODR-DabMod](https://github.com/Opendigitalradio/ODR-DabMod) 
 (resp. [ODR-SourceCompanion](https://github.com/Opendigitalradio/ODR-SourceCompanion)).
 
+
+
+### Installation From Source
+
+    git clone https://github.com/ohrstrom/obp-pad-composer.git pad-composer
+    cd pad-composer
+    virtualenv env
+    source env/bin/activate
+    python setup.py develop
+
+
+
 ### Supervisor Example
 
     [program:pad-composer]

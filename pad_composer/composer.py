@@ -62,16 +62,16 @@ class PadComposer(object):
         )
 
         # start timers
-        # self.dls_text_scheduler = BackgroundScheduler()
-        # self.dls_text_scheduler.add_job(self.set_dls_text, trigger='interval', seconds=dls_interval)
-        # self.dls_text_scheduler.start()
+        self.dls_text_scheduler = BackgroundScheduler()
+        self.dls_text_scheduler.add_job(self.set_dls_text, trigger='interval', seconds=dls_interval)
+        self.dls_text_scheduler.start()
 
-        # self.slide_scheduler = BackgroundScheduler()
-        # self.slide_scheduler.add_job(self.set_slide, trigger='interval', seconds=slide_interval)
-        # self.slide_scheduler.start()
+        self.slide_scheduler = BackgroundScheduler()
+        self.slide_scheduler.add_job(self.set_slide, trigger='interval', seconds=slide_interval)
+        self.slide_scheduler.start()
 
-        self.set_dls_text()
-        self.set_slide()
+        # self.set_dls_text()
+        # self.set_slide()
 
 
         # clean slide directory
@@ -91,20 +91,23 @@ class PadComposer(object):
                 start_next = None
 
             if start_next:
-                if start_next > DEFAULT_MAX_SLEEP:
+
+                print('got start next: {}'.format(start_next))
+
+                if start_next > DEFAULT_MAX_SLEEP or start_next <= 0:
                     log.debug('start_next is {} seconds - setting to {}'.format(start_next, DEFAULT_MAX_SLEEP))
                     start_next = DEFAULT_MAX_SLEEP
                 #log.debug('Got scheduled item - sleeping for {} seconds'.format(start_next))
-                time.sleep(start_next)
+                time.sleep(int(start_next))
 
             else:
                 #log.debug('No scheduled item - sleeping for {} seconds'.format(DEFAULT_SLEEP))
                 time.sleep(DEFAULT_SLEEP)
 
-    def stop(self):
-        #self.dls_text_scheduler.shutdown()
-        pass
 
+    def stop(self):
+        self.dls_text_scheduler.shutdown()
+        self.slide_scheduler.shutdown()
 
 
     def get_current_item(self):
@@ -121,10 +124,6 @@ class PadComposer(object):
         else:
             log.debug('DLS text: {}'.format(' *** '.join(dls)))
             self.current_dls = dls
-
-
-
-
 
         slides = response.get('slides', None)
 
@@ -152,7 +151,7 @@ class PadComposer(object):
 
         self.current_dls_index += 1
 
-        Timer(self.dls_interval, self.set_dls_text).start()
+        #Timer(self.dls_interval, self.set_dls_text).start()
 
 
 
@@ -203,9 +202,9 @@ class PadComposer(object):
         next_in = transmission_time * 1.25 + 4
         next_in = self.slide_interval
 
-        print('slide size:                  {}bytes'.format(slide_size))
-        print('estimated transmission time: {}s'.format(transmission_time))
-        print('next slide in:               {}s'.format(next_in))
+        # print('slide size:                  {}bytes'.format(slide_size))
+        # print('estimated transmission time: {}s'.format(transmission_time))
+        # print('next slide in:               {}s'.format(next_in))
         #
         #
         #
@@ -215,4 +214,4 @@ class PadComposer(object):
         log.debug('next slide in: {}'.format(next_in))
 
 
-        Timer(next_in, self.set_slide).start()
+        #Timer(next_in, self.set_slide).start()
