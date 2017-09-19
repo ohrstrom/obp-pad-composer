@@ -22,6 +22,19 @@ The composed metadata then is fed to [ODR-PadEnc](https://github.com/Opendigital
     virtualenv env
     source env/bin/activate
     python setup.py develop
+    
+    
+    
+### Example Command
+
+    pad-composer \
+    -a https://www.openbroadcast.org \
+    -c 1 \
+    -d meta/dls.txt \
+    -s meta/slides \
+    -t -25 \
+    --dls-interval 14 \
+    --slide-interval 30
 
 
 
@@ -30,7 +43,7 @@ The composed metadata then is fed to [ODR-PadEnc](https://github.com/Opendigital
     [program:pad-composer]
     priority=200
     directory=/home/odr/pad-composer/
-    command=/home/odr/pad-composer/env/bin/python composer.py
+    command=/home/odr/pad-composer/env/bin/pad-composer
         --api https://www.openbroadcast.org
         --channel 1
         --timeshift 120

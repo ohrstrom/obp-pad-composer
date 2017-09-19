@@ -9,12 +9,12 @@ install:
 - pip install pytest
 script:
 - pad-composer --help
-#deploy:
-#  provider: pypi
-#  user: ohrstrom
-#  password:
-#    secure: TDDiFaCUW726omMhzRl2gVQwZDfQzYBfR+jN6wOkYCrDVsXx55LdokTaWInvcOxeii3R0eYCT6TpNz43oGObp9hQ+LWc8MbqqGClDzw3a6m7eCHjNVcaeeQGnq83igmjvq4XBectI1nZ7Poy4M82ZAxzGOLGl2HqBVHyLASyUBFXlkU3Q6ZaBmXptzO0TNi1Pyie/i06paatVKOXotpR11UvT7J68gu2d2N/+jC1QRwUR+PiE/sxXMiIK2bVLYCaGUN6gy2UwRGlvaYkRNksRUCn8cPAXvPOrmPzyIX8hC2q0XmRZ9IX+2P2rV3YsDjxxGHlaPPV3orPcdvRKCQDCfHFEMn8sLN8tnUvLkWFsMkqV7GCZWwP4PeDfJi/uoqmTF9x5iYxiFqU4eNERC5riO3mTQhtmCHW9sM5m7M97ndGCoe7PH8fUfPNrpUlWZMjVeUoE+GepvaBYM1+RKi7bQroCRClsJ3qo98pBEv6hw89LzYIyUyLQ7kPAG1lkScj4a/mr1wA/8jPbTZeF0n44EE2Sh8SQCZNn9JcZ9COwdDctQHhozz+4JQqfrD3LTf9Zc141GxGt1ho6ufBAZKgEqMYLwIQwxjFsBDw5cSLhtAmR7TlDQJV7GO6e0gVq66cxZ5salx2YPXn0yURotFgeyC7o8wMlY54swOtLGgs+B0=
-#  on:
-#    tags: true
-#    repo: ohrstrom/obp-pad-composer
-#    branch: master
+deploy:
+  provider: pypi
+  user: ohrstrom
+  password:
+    secure: TDDiFaCUW726omMhzRl2gVQwZDfQzYBfR+jN6wOkYCrDVsXx55LdokTaWInvcOxeii3R0eYCT6TpNz43oGObp9hQ+LWc8MbqqGClDzw3a6m7eCHjNVcaeeQGnq83igmjvq4XBectI1nZ7Poy4M82ZAxzGOLGl2HqBVHyLASyUBFXlkU3Q6ZaBmXptzO0TNi1Pyie/i06paatVKOXotpR11UvT7J68gu2d2N/+jC1QRwUR+PiE/sxXMiIK2bVLYCaGUN6gy2UwRGlvaYkRNksRUCn8cPAXvPOrmPzyIX8hC2q0XmRZ9IX+2P2rV3YsDjxxGHlaPPV3orPcdvRKCQDCfHFEMn8sLN8tnUvLkWFsMkqV7GCZWwP4PeDfJi/uoqmTF9x5iYxiFqU4eNERC5riO3mTQhtmCHW9sM5m7M97ndGCoe7PH8fUfPNrpUlWZMjVeUoE+GepvaBYM1+RKi7bQroCRClsJ3qo98pBEv6hw89LzYIyUyLQ7kPAG1lkScj4a/mr1wA/8jPbTZeF0n44EE2Sh8SQCZNn9JcZ9COwdDctQHhozz+4JQqfrD3LTf9Zc141GxGt1ho6ufBAZKgEqMYLwIQwxjFsBDw5cSLhtAmR7TlDQJV7GO6e0gVq66cxZ5salx2YPXn0yURotFgeyC7o8wMlY54swOtLGgs+B0=
+  on:
+    tags: true
+    repo: ohrstrom/obp-pad-composer
+    branch: master

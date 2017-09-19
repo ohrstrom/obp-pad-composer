@@ -2,6 +2,7 @@ meta
 .idea
 .tox
 .coverage
+.cache
 *.pyc
 env/
 venv/
