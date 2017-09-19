@@ -1,5 +1,7 @@
 # OBP PAD Composer
 
+[![Build Status](https://travis-ci.org/ohrstrom/obp-pad-composer.svg?branch=master)](https://travis-ci.org/digris/odr-stream-router)
+
 
 `pad-composer` is a rather specific piece of code that likely is not too useful for a larger crowd. (Except for
 looking at isolated bits)
