@@ -117,7 +117,7 @@ class PadComposer(object):
         r = requests.get(self.api_url)
         response = r.json()
 
-        dls = response.get('dls_text' if self.dl_plus else 'dls_text', None)
+        dls = response.get('dl_plus' if self.dl_plus else 'dls_text', None)
 
         if self.current_dls == dls:
             log.debug('DLS unchanged')
@@ -147,7 +147,7 @@ class PadComposer(object):
         text = self.current_dls[self.current_dls_index]
         log.debug('setting DLS text to: {}'.format(text))
         with codecs.open(self.dls_path, 'w', "utf-8") as dls_text_file:
-            dls_text_file.write(text + '\n')
+            dls_text_file.write(text)
 
         self.current_dls_index += 1
 

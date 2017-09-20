@@ -23,8 +23,7 @@ The composed metadata then is fed to [ODR-PadEnc](https://github.com/Opendigital
     source env/bin/activate
     python setup.py develop
     
-    
-    
+
 ### Example Command
 
     pad-composer \
@@ -35,7 +34,6 @@ The composed metadata then is fed to [ODR-PadEnc](https://github.com/Opendigital
     -t -25 \
     --dls-interval 14 \
     --slide-interval 30
-
 
 
 ### Supervisor Example
