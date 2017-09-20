@@ -10,7 +10,7 @@ from .composer import (
     DEFAULT_API_BASE_URL, DEFAULT_TIME_SHIFT, DEFAULT_DLS_INTERVAL, DEFAULT_SLIDE_INTERVAL
 )
 
-__version__ = '0.0.1'
+__version__ = '0.0.2'
 
 log = logging.getLogger(__name__)
 click_log.basic_config(log)

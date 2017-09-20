@@ -13,7 +13,7 @@ setup(
     author_email='ohrstrom@gmail.com',
     url='https://github.com/ohrstrom/obp-pad-composer',
     name='obp-pad-composer',
-    version='0.0.1',
+    version='0.0.2',
     description='DAB+ Pad data composer (for Open Broadcast API)',
     packages=find_packages(),
     install_requires=INSTALL_REQUIREMENTS,
